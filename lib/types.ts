@@ -14,6 +14,29 @@ export type DemoState = {
   preferences: FeaturePreferences;
 };
 
+export type LearningPreference = {
+  label: string;
+  value: string;
+  evidence: string;
+};
+
+export type LearningProfile = {
+  schemaVersion: 1;
+  sourceFile: string;
+  importedAt: string;
+  conversationCount: number;
+  userMessageCount: number;
+  wordCount: number;
+  dateRange: { from: string; to: string } | null;
+  topTopics: string[];
+  learningPromptRate: number;
+  preferences: {
+    explanationStyle: LearningPreference;
+    detailLevel: LearningPreference;
+    reinforcement: LearningPreference;
+  };
+};
+
 export type LectureSection = {
   id: string;
   eyebrow: string;

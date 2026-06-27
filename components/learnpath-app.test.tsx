@@ -45,6 +45,35 @@ describe("LearnPathApp", () => {
     await waitFor(() => expect(window.localStorage.length).toBe(1));
   });
 
+  it("links the settings drawer to the ChatGPT learning profile", () => {
+    render(<LearnPathApp />);
+    fireEvent.click(screen.getByLabelText("Open LearnPath settings"));
+    expect(screen.getByRole("link", { name: /ChatGPT learning profile/ })).toHaveAttribute("href", "/learning-profile");
+  });
+
+  it("uses a saved learning profile to explain lesson personalization", async () => {
+    window.localStorage.setItem("learnpath-chatgpt-profile-v1", JSON.stringify({
+      schemaVersion: 1,
+      sourceFile: "export.zip",
+      importedAt: "2026-06-27T00:00:00.000Z",
+      conversationCount: 12,
+      userMessageCount: 30,
+      wordCount: 500,
+      dateRange: null,
+      topTopics: ["Algorithms"],
+      learningPromptRate: 70,
+      preferences: {
+        explanationStyle: { label: "Learning style", value: "Step-by-step", evidence: "Evidence" },
+        detailLevel: { label: "Detail level", value: "Layered detail", evidence: "Evidence" },
+        reinforcement: { label: "Learning style", value: "Practice questions", evidence: "Evidence" },
+      },
+    }));
+
+    render(<LearnPathApp />);
+    expect(await screen.findByText(/learning profile favors step-by-step explanations with practice questions/i)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "View learning profile" })).toHaveAttribute("href", "/learning-profile");
+  });
+
   it("walks factorial(4) through smaller recursive calls", () => {
     render(<LearnPathApp />);
     const diagram = screen.getByLabelText("Factorial 4 recursive call diagram");

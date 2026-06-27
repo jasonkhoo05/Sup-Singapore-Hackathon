@@ -3,13 +3,13 @@
 import { BarChart3, BookOpen, Menu, Route, Settings2, X } from "lucide-react";
 import { useState } from "react";
 
-type HeaderSection = "courses" | "learn" | "lecturer";
+type HeaderSection = "courses" | "learn" | "lecturer" | "profile";
 
 type AppHeaderProps = {
   activeSection: HeaderSection;
   agentActive?: boolean;
   onOpenSettings?: () => void;
-  onSelectSection?: (section: Exclude<HeaderSection, "courses">) => void;
+  onSelectSection?: (section: "learn" | "lecturer") => void;
 };
 
 export function AppHeader({
@@ -20,7 +20,7 @@ export function AppHeader({
 }: AppHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  function selectSection(section: Exclude<HeaderSection, "courses">) {
+  function selectSection(section: "learn" | "lecturer") {
     setMenuOpen(false);
     onSelectSection?.(section);
   }

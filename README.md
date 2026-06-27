@@ -1,6 +1,8 @@
 # LearnPath AI
 
-LearnPath AI is a deterministic hackathon demo of an adaptive educational agent layered over a Moodle-style course. It simplifies difficult lecture content, shows prerequisite and future-topic relationships, provides a pixel-art concept visualization, adapts a mastery quiz, and summarizes cohort insights for lecturers.
+LearnPath AI is a deterministic hackathon demo of an adaptive educational agent layered over a Moodle-style course. It simplifies difficult lecture content, shows prerequisite and future-topic relationships, provides a pixel-art concept visualization, adapts a mastery quiz, summarizes cohort insights for lecturers, and can privately derive learning preferences from a student’s ChatGPT export.
+
+ChatGPT ZIP exports and `conversations.json` files are analyzed entirely in the browser. Only the resulting compact learning profile is stored in local storage; raw conversation content is not retained or sent to a server.
 
 ## Local development
 

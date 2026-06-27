@@ -46,7 +46,8 @@ import {
   scoreQuiz,
   STORAGE_KEY,
 } from "@/lib/demo-state";
-import type { DemoState, FeaturePreferences, LecturerInsight } from "@/lib/types";
+import { LEARNING_PROFILE_KEY, parseLearningProfile } from "@/lib/chatgpt-import";
+import type { DemoState, FeaturePreferences, LearningProfile, LecturerInsight } from "@/lib/types";
 
 type View = "learn" | "lecturer";
 type ContentMode = "adapted" | "original";
@@ -60,12 +61,14 @@ export function LearnPathApp() {
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [quizScore, setQuizScore] = useState<number | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [learningProfile, setLearningProfile] = useState<LearningProfile | null>(null);
 
   useEffect(() => {
     setState(parseStoredState(window.localStorage.getItem(STORAGE_KEY)));
     const searchParams = new URLSearchParams(window.location.search);
     if (searchParams.get("view") === "lecturer") setView("lecturer");
     if (searchParams.get("settings") === "open") setSettingsOpen(true);
+    setLearningProfile(parseLearningProfile(window.localStorage.getItem(LEARNING_PROFILE_KEY)));
     setHydrated(true);
   }, []);
 
@@ -158,6 +161,7 @@ export function LearnPathApp() {
           retryQuiz={retryQuiz}
           hasMastered={hasMastered}
           openSettings={() => setSettingsOpen(true)}
+          learningProfile={learningProfile}
         />
       ) : (
         <LecturerView resetDemo={resetDemo} />
@@ -191,6 +195,7 @@ type StudentViewProps = {
   retryQuiz: () => void;
   hasMastered: boolean;
   openSettings: () => void;
+  learningProfile: LearningProfile | null;
 };
 
 function StudentView({
@@ -207,6 +212,7 @@ function StudentView({
   retryQuiz,
   hasMastered,
   openSettings,
+  learningProfile,
 }: StudentViewProps) {
   return (
     <div className="student-layout">
@@ -249,9 +255,11 @@ function StudentView({
             <div className="adaptation-copy">
               <div className="eyebrow-line"><span>Adapted for you</span><span className="demo-pill">SIMULATED AI</span></div>
               <h2>{level === "struggling" ? "Let’s build the mental model first" : "You’ve built the foundation — let’s go deeper"}</h2>
-              <p>{level === "struggling"
-                ? "Your last quiz showed that call stacks were unclear. I’ve simplified two explanations and added a visual walkthrough."
-                : "Your latest mastery check unlocked the next learning pathways and the challenge section below."}</p>
+              <p>{learningProfile
+                ? `Your learning profile favors ${learningProfile.preferences.explanationStyle.value.toLowerCase()} explanations with ${learningProfile.preferences.reinforcement.value.toLowerCase()}. I’ve combined that with your course activity.`
+                : level === "struggling"
+                  ? "Your last quiz showed that call stacks were unclear. I’ve simplified two explanations and added a visual walkthrough."
+                  : "Your latest mastery check unlocked the next learning pathways and the challenge section below."}</p>
             </div>
             <div className="confidence-box"><span>Learning confidence</span><strong>{state.mastery}%</strong><TrendingUp size={16} /></div>
           </section>
@@ -314,12 +322,23 @@ function StudentView({
       <aside className="coach-sidebar">
         <div className="coach-card">
           <div className="coach-title"><div className="coach-orb"><BrainCircuit size={18} /></div><div><span>Your learning guide</span><strong>Why this path?</strong></div></div>
-          <p>Based on your recent activity, I’m helping you connect recursion to the call stack before moving on.</p>
-          <div className="signal-list">
-            <div><span className="signal-icon amber"><Clock3 size={15} /></span><span><strong>2.3× longer</strong> on stack-frame questions</span></div>
-            <div><span className="signal-icon red"><CircleHelp size={15} /></span><span><strong>2 attempts</strong> on the base-case activity</span></div>
-            <div><span className="signal-icon green"><Check size={15} /></span><span><strong>Strong</strong> understanding of functions</span></div>
-          </div>
+          <p>{learningProfile
+            ? "I’m combining your imported learning preferences with what happens inside this course."
+            : "Based on your recent activity, I’m helping you connect recursion to the call stack before moving on."}</p>
+          {learningProfile ? (
+            <div className="signal-list profile-signal-list">
+              <div><span className="signal-icon amber"><WandSparkles size={15} /></span><span><strong>{learningProfile.preferences.explanationStyle.value}</strong> explanations</span></div>
+              <div><span className="signal-icon red"><BookOpen size={15} /></span><span><strong>{learningProfile.preferences.detailLevel.value}</strong> detail</span></div>
+              <div><span className="signal-icon green"><Check size={15} /></span><span><strong>{learningProfile.preferences.reinforcement.value}</strong> to reinforce</span></div>
+            </div>
+          ) : (
+            <div className="signal-list">
+              <div><span className="signal-icon amber"><Clock3 size={15} /></span><span><strong>2.3× longer</strong> on stack-frame questions</span></div>
+              <div><span className="signal-icon red"><CircleHelp size={15} /></span><span><strong>2 attempts</strong> on the base-case activity</span></div>
+              <div><span className="signal-icon green"><Check size={15} /></span><span><strong>Strong</strong> understanding of functions</span></div>
+            </div>
+          )}
+          {learningProfile && <a className="text-button profile-link" href="/learning-profile">View learning profile <ArrowRight size={14} /></a>}
           <button className="text-button" onClick={openSettings}>Tune my learning path <ArrowRight size={14} /></button>
         </div>
 
@@ -775,6 +794,12 @@ function SettingsDrawer({ preferences, updatePreference, close, resetDemo }: Set
       <aside className="settings-drawer" role="dialog" aria-modal="true" aria-labelledby="settings-title">
         <div className="drawer-header"><div><span className="section-kicker">You’re in control</span><h2 id="settings-title">LearnPath settings</h2></div><button className="icon-button" onClick={close} aria-label="Close settings"><X size={19} /></button></div>
         <p className="drawer-intro">Choose how LearnPath supports you. Your lecturer’s original content is always one click away.</p>
+
+        <a className="profile-settings-link" href="/learning-profile">
+          <div className="setting-icon"><UserRound size={20} /></div>
+          <div><strong>ChatGPT learning profile</strong><span>Import your history to personalize how LearnPath teaches.</span></div>
+          <ArrowRight size={17} />
+        </a>
 
         <div className="master-switch">
           <div className="setting-icon"><BrainCircuit size={20} /></div>
