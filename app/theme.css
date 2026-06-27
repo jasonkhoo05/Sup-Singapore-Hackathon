@@ -308,6 +308,15 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .profile-stat-strip svg { color: var(--red); grid-row: 1 / 3; margin-top: 3px; }
 .profile-stat-strip strong { color: #eef4fa; font-size: 14px; }
 .profile-stat-strip span { color: var(--faint); font-size: 7px; text-transform: uppercase; }
+.learning-summary-card { align-items: flex-start; background: linear-gradient(105deg, rgba(156,114,255,.13), rgba(53,215,255,.055) 62%, rgba(185,243,61,.06)); border: 1px solid #40506d; display: grid; gap: 17px; grid-template-columns: auto 1fr; margin-top: 16px; padding: 23px; position: relative; }
+.learning-summary-card::after { background: linear-gradient(90deg, #9c72ff, #35d7ff, var(--red)); content: ""; height: 2px; inset: 0 0 auto; position: absolute; }
+.learning-summary-icon { align-items: center; background: rgba(156,114,255,.14); border: 1px solid #7455aa; color: #c5adff; display: flex; height: 48px; justify-content: center; width: 48px; }
+.learning-summary-copy > span { color: var(--red); font-family: var(--mono); font-size: 7px; letter-spacing: .11em; }
+.learning-summary-copy h3 { color: #f6f8fc; font-size: 19px; letter-spacing: -.45px; margin: 7px 0 8px; }
+.learning-summary-copy > p { color: #aebccd; font-size: 10px; line-height: 1.75; margin: 0; max-width: 900px; }
+.learning-summary-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+.learning-summary-actions span { align-items: center; background: rgba(4,13,23,.52); border: 1px solid #334b60; color: #bdc9d5; display: flex; font-size: 8px; gap: 5px; padding: 7px 9px; }
+.learning-summary-actions svg { color: var(--green); }
 .preference-grid { display: grid; gap: 13px; grid-template-columns: repeat(3, 1fr); margin-top: 16px; }
 .preference-card { background: #0a1725; border: 1px solid #263d52; min-height: 158px; overflow: hidden; padding: 21px; position: relative; }
 .preference-card::before { background: #9c72ff; content: ""; height: 2px; inset: 0 0 auto; position: absolute; }
@@ -356,6 +365,8 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .profile-results-heading { align-items: flex-start; flex-direction: column; gap: 14px; }
   .profile-stat-strip, .preference-grid { grid-template-columns: 1fr; }
   .profile-stat-strip > div + div { border-left: 0; border-top: 1px solid #23394d; }
+  .learning-summary-card { grid-template-columns: 1fr; padding: 19px; }
+  .learning-summary-icon { height: 40px; width: 40px; }
   .profile-ready-cta { align-items: flex-start; grid-template-columns: auto 1fr; }
   .profile-ready-cta a { grid-column: 2; }
   .profile-empty { align-items: flex-start; grid-template-columns: auto 1fr; }

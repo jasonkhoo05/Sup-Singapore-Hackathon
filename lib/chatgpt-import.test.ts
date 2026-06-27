@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { analyzeChatGPTExport, parseLearningProfile } from "@/lib/chatgpt-import";
+import { analyzeChatGPTExport, parseLearningProfile, summarizeLearningProfile } from "@/lib/chatgpt-import";
 
 const exportFixture = [
   {
@@ -59,5 +59,20 @@ describe("ChatGPT export analysis", () => {
     expect(parseLearningProfile(JSON.stringify(profile))).toEqual(profile);
     expect(parseLearningProfile("not-json")).toBeNull();
     expect(parseLearningProfile(JSON.stringify({ schemaVersion: 2 }))).toBeNull();
+  });
+
+  it("summarizes how the student learns best", () => {
+    const profile = analyzeChatGPTExport(exportFixture);
+    const summary = summarizeLearningProfile(profile);
+
+    expect(summary.title).toBe("You learn best with step-by-step guidance");
+    expect(summary.body).toContain("clear, ordered steps");
+    expect(summary.body).toContain("practice questions");
+    expect(summary.body).toContain("Recursion");
+    expect(summary.actions).toEqual([
+      "Use step-by-step explanations",
+      "Provide layered detail",
+      "Reinforce with practice questions",
+    ]);
   });
 });

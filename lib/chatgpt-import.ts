@@ -183,6 +183,49 @@ export function parseLearningProfile(value: string | null): LearningProfile | nu
   }
 }
 
+export function summarizeLearningProfile(profile: LearningProfile) {
+  const style = profile.preferences.explanationStyle.value;
+  const detail = profile.preferences.detailLevel.value;
+  const reinforcement = profile.preferences.reinforcement.value;
+
+  const stylePhrase: Record<string, string> = {
+    "Step-by-step": "working through ideas in clear, ordered steps",
+    "Example-led": "seeing a concrete example before moving to abstract rules",
+    "Concept-first": "understanding why a concept works before applying it",
+    "Balanced explanations": "moving between steps, examples, and underlying concepts",
+  };
+  const detailPhrase: Record<string, string> = {
+    "Concise first": "starting with a short answer before adding optional detail",
+    "Deep dives": "exploring the reasoning in depth",
+    "Layered detail": "starting with the core idea and revealing more detail gradually",
+  };
+  const reinforcementPhrase: Record<string, string> = {
+    "Practice questions": "checking understanding with practice questions",
+    "Visual support": "reinforcing new ideas with diagrams and visual support",
+    "Applied scenarios": "connecting new ideas to practical, real-world scenarios",
+    "Mixed reinforcement": "using a mix of practice, visuals, and applications",
+  };
+
+  const topicClause = profile.topTopics.length
+    ? ` Your most frequent learning topics include ${joinList(profile.topTopics.slice(0, 3))}.`
+    : "";
+  const learningSignal = profile.learningPromptRate >= 60
+    ? "A large share of your prompts are learning-focused"
+    : profile.learningPromptRate >= 30
+      ? "A meaningful share of your prompts are learning-focused"
+      : "Your learning-focused prompts still show a consistent pattern";
+
+  return {
+    title: `You learn best with ${style.toLowerCase()} guidance`,
+    body: `${learningSignal}. Your history suggests you learn best by ${stylePhrase[style] ?? "combining several explanation styles"}, ${detailPhrase[detail] ?? "using an appropriate amount of detail"}, and ${reinforcementPhrase[reinforcement] ?? "revisiting the idea in different ways"}.${topicClause}`,
+    actions: [
+      `Use ${style.toLowerCase()} explanations`,
+      `Provide ${detail.toLowerCase()}`,
+      `Reinforce with ${reinforcement.toLowerCase()}`,
+    ],
+  };
+}
+
 function asTimestamp(value: unknown): number | null {
   if (typeof value !== "number" || !Number.isFinite(value)) return null;
   const milliseconds = value < 10_000_000_000 ? value * 1000 : value;
@@ -221,4 +264,10 @@ function extractTopics(text: string) {
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .slice(0, 6)
     .map(([word]) => word.replace(/\b\w/g, (letter) => letter.toUpperCase()));
+}
+
+function joinList(items: string[]) {
+  if (items.length <= 1) return items[0] ?? "";
+  if (items.length === 2) return `${items[0]} and ${items[1]}`;
+  return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
 }

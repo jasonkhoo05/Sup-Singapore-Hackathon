@@ -21,6 +21,7 @@ import {
   analyzeChatGPTFile,
   LEARNING_PROFILE_KEY,
   parseLearningProfile,
+  summarizeLearningProfile,
 } from "@/lib/chatgpt-import";
 import type { LearningPreference, LearningProfile } from "@/lib/types";
 
@@ -183,6 +184,7 @@ export function LearningProfilePage() {
 
 function ProfileSummary({ profile }: { profile: LearningProfile }) {
   const preferences = [profile.preferences.explanationStyle, profile.preferences.detailLevel, profile.preferences.reinforcement];
+  const summary = summarizeLearningProfile(profile);
   return (
     <>
       <div className="profile-stat-strip">
@@ -191,6 +193,17 @@ function ProfileSummary({ profile }: { profile: LearningProfile }) {
         <div><Sparkles size={18} /><strong>{profile.learningPromptRate}%</strong><span>learning-oriented</span></div>
         <div><CalendarDays size={18} /><strong>{profile.dateRange ? formatDateRange(profile.dateRange) : "Not dated"}</strong><span>history represented</span></div>
       </div>
+      <article className="learning-summary-card" aria-labelledby="learning-summary-title">
+        <div className="learning-summary-icon"><BrainCircuit size={24} /></div>
+        <div className="learning-summary-copy">
+          <span>YOUR LEARNING SUMMARY</span>
+          <h3 id="learning-summary-title">{summary.title}</h3>
+          <p>{summary.body}</p>
+          <div className="learning-summary-actions" aria-label="How LearnPath will adapt">
+            {summary.actions.map((action) => <span key={action}><CheckCircle2 size={12} />{action}</span>)}
+          </div>
+        </div>
+      </article>
       <div className="preference-grid">
         {preferences.map((item, index) => <PreferenceCard key={`${item.value}-${index}`} preference={item} index={index} />)}
       </div>
